@@ -382,7 +382,7 @@ in
         virtualisation.podnix.username = mkOption {
             type = with types; str;
         };
-        virtualisation.podnix-podman.pods = mkOption {
+        virtualisation.podnix.pods = mkOption {
             type = with types; attrsOf (types.submodule podOptions);
             default = {};
         };   
