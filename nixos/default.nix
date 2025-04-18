@@ -323,8 +323,8 @@ let
                 documentation="man:podman-generate-systemd(1)";
                 wants=["network-online.target"];
                 #RequiresMountsFor="%t/containers";
-                bindsTo=PodServiceName;
-                after=["network-online.target" PodServiceName];
+                bindsTo=[ "${PodServiceName}" ];
+                after=["network-online.target" "${PodServiceName}" ];
                 environment=[
                     "PATH=/bin:/sbin:/nix/var/nix/profiles/default/bin:/run/wrappers/bin"
                     "PODMAN_SYSTEMD_UNIT=%n"
