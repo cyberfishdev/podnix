@@ -215,19 +215,18 @@ let
             podStartOptions = concatMapStrings (x: " " + x) podStartOptionsList;
         in
             {
-                Unit = {
-                    Description="Podman ${mappedName}.service";
-                    Documentation="man:podman-generate-systemd(1)";
-                    RequiresMountsFor="/tmp/containers-user-${cfg.uid}/containers";
-                    Wants=["network-online.target" "podman.socket"] ++ containers;
-                    Before=containers;
-                    After=["network-online.target" "podman.socket" "sops-nix.service"];
+                description="Podman ${mappedName}.service";
+                documentation="man:podman-generate-systemd(1)";
+                   # RequiresMountsFor="/tmp/containers-user-${cfg.uid}/containers";
+                wants=["network-online.target" "podman.socket"] ++ containers;
+                before=containers;
+                after=["network-online.target" "podman.socket" "sops-nix.service"];
                 };
-                Service = {
-                    Environment=[
+                environment=[
                         "PATH=/bin:/sbin:/nix/var/nix/profiles/default/bin:/run/wrappers/bin"
                         "PODMAN_SYSTEMD_UNIT=%n"
                     ];
+                serviceConfig = {
                     Restart="on-failure";
                     TimeoutStopSec="70";
                     ExecStartPre=''
@@ -256,10 +255,7 @@ let
                     PIDFile="%t/${mappedName}.pid";
                     Type="forking";
                 };
-                Install = {
-                    WantedBy=["default.target"];
-                };
-            }
+                wantedBy=["default.target"];
         );
 
     containerTemplate = name: value: mappedName: podName:(
@@ -324,15 +320,17 @@ let
                 );
         in
         {
-            Unit= {
-                Description="Podman ${mappedName}.service";
-                Documentation="man:podman-generate-systemd(1)";
-                Wants=["network-online.target"];
-                RequiresMountsFor="%t/containers";
-                BindsTo=PodServiceName;
-                After=["network-online.target" PodServiceName];
-            };
-            Service = {
+                description="Podman ${mappedName}.service";
+                documentation="man:podman-generate-systemd(1)";
+                wants=["network-online.target"];
+                #RequiresMountsFor="%t/containers";
+                bindsTo=PodServiceName;
+                after=["network-online.target" PodServiceName];
+                environment=[
+                    "PATH=/bin:/sbin:/nix/var/nix/profiles/default/bin:/run/wrappers/bin"
+                    "PODMAN_SYSTEMD_UNIT=%n"
+                ];
+            serviceConfig = {
                 ExecStart=''
                     ${pkgs.podman}/bin/podman run \
                         --cidfile=%t/%n.ctr-id \
@@ -359,19 +357,13 @@ let
                         --cidfile=%t/%n.ctr-id; \
                         ${ExecStopPostSecrets}"
                 '';
-                Environment=[
-                    "PATH=/bin:/sbin:/nix/var/nix/profiles/default/bin:/run/wrappers/bin"
-                    "PODMAN_SYSTEMD_UNIT=%n"
-                ];
                 Restart="on-failure";
                 TimeoutStopSec="70";
                 ExecStartPre=''${pkgs.bash}/bin/bash -c "''+ServiceExecStartPre+''"'';
                 Type="notify";
                 NotifyAccess="all";
             };
-            Install = {
-                WantedBy=["default.target"];
-            };
+            wantedBy=["default.target"];
         });
 in
 {
