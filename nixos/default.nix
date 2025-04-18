@@ -221,7 +221,6 @@ let
                 wants=["network-online.target" "podman.socket"] ++ containers;
                 before=containers;
                 after=["network-online.target" "podman.socket" "sops-nix.service"];
-                };
                 environment=[
                         "PATH=/bin:/sbin:/nix/var/nix/profiles/default/bin:/run/wrappers/bin"
                         "PODMAN_SYSTEMD_UNIT=%n"
@@ -256,7 +255,7 @@ let
                     Type="forking";
                 };
                 wantedBy=["default.target"];
-        );
+        });
 
     containerTemplate = name: value: mappedName: podName:(
         let
