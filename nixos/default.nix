@@ -2,7 +2,7 @@
 
 with lib;
 let
-    cfg = config.virtualisation.rootless-podman;
+    cfg = config.virtualisation.podnix;
     
     sopsSecretType = 
         { ... }: {
@@ -376,10 +376,13 @@ let
 in
 {
     options = {
-        virtualisation.rootless-podman.uid = mkOption {
+        virtualisation.podnix.uid = mkOption {
             type = with types; str;
         };
-        virtualisation.rootless-podman.pods = mkOption {
+        virtualisation.podnix.username = mkOption {
+            type = with types; str;
+        };
+        virtualisation.podnix-podman.pods = mkOption {
             type = with types; attrsOf (types.submodule podOptions);
             default = {};
         };   
